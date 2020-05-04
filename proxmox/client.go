@@ -182,7 +182,7 @@ func (c *Client) GetVmRefByVmID(vmID int) (vmr *VmRef, err error) {
 	vms := resp["data"].([]interface{})
 	for vmii := range vms {
 		vm := vms[vmii].(map[string]interface{})
-		if int(vm["vmid"].(float64)) == vmID {
+		if int(vm["vmid"].(int)) == vmID {
 			vmr = NewVmRef(int(vm["vmid"].(float64)))
 			vmr.node = vm["node"].(string)
 			vmr.vmType = vm["type"].(string)
