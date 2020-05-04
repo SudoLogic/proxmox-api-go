@@ -177,6 +177,28 @@ func (c *Client) GetVmRefByName(vmName string) (vmr *VmRef, err error) {
 	return nil, errors.New(fmt.Sprintf("Vm '%s' not found", vmName))
 }
 
+func (c *Client) GetVmRefByVmID(vmID int) (vmr *VmRef, err error) {
+	resp, err := c.GetVmList()
+	vms := resp["data"].([]interface{})
+	for vmii := range vms {
+		vm := vms[vmii].(map[string]interface{})
+		if int(vm["vmid"].(float64)) == vmr.vmId {
+			vmr = NewVmRef(int(vm["vmid"].(float64)))
+			vmr.node = vm["node"].(string)
+			vmr.vmType = vm["type"].(string)
+			vmr.pool = ""
+			if vm["pool"] != nil {
+				vmr.pool = vm["pool"].(string)
+			}
+			if vm["hastate"] != nil {
+				vmr.haState = vm["hastate"].(string)
+			}
+			return
+		}
+	}
+	return nil, errors.New(fmt.Sprintf("Vm '%d' not found", vmID))
+}
+
 func (c *Client) GetVmState(vmr *VmRef) (vmState map[string]interface{}, err error) {
 	err = c.CheckVmRef(vmr)
 	if err != nil {
